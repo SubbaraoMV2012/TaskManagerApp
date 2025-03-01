@@ -8,36 +8,88 @@
 import XCTest
 
 final class TaskManagerAppUITests: XCTestCase {
-
+    private var app: XCUIApplication!
+    
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
+        app = XCUIApplication()
         app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    }
+    
+    override func tearDownWithError() throws {
+        app.terminate()
+        app = nil
+    }
+    
+    func testAddNewTask() throws {
+        let addButton = app.buttons["AddTaskButton"]
+        
+        XCTAssertTrue(addButton.waitForExistence(timeout: 5), "Add Task button did not appear in time.")
+        
+        if !addButton.isHittable {
+            app.swipeUp()
+        }
+        
+        XCTAssertTrue(addButton.isHittable, "Add Task button is still not accessible after scrolling.")
+        addButton.tap()
+        
+        let titleField = app.textFields["Task title"]
+        XCTAssertTrue(titleField.waitForExistence(timeout: 3), "Task Title field is missing.")
+        
+        titleField.tap()
+        titleField.typeText("New Task")
+        
+        let saveButton = app.buttons["Save Task"]
+        XCTAssertTrue(saveButton.waitForExistence(timeout: 3), "Save button is missing.")
+        saveButton.tap()
+        
+        XCTAssertTrue(app.staticTexts["New Task"].waitForExistence(timeout: 3), "Newly added task is not visible.")
+    }
+    
+    func testSortAndFilterTasks() throws {
+        print(app.debugDescription)
+        
+        let sortButton = app.buttons["Sort tasks-Filter tasks"]
+        XCTAssertTrue(sortButton.waitForExistence(timeout: 5), "Sort & Filter button did not appear in time.")
+        
+        sortButton.tap()
+        
+        let alphabeticalSortButton = app.buttons["Alphabetically"]
+        XCTAssertTrue(alphabeticalSortButton.waitForExistence(timeout: 3), "Alphabetically sort button is missing.")
+        
+        alphabeticalSortButton.tap()
+        
+        sleep(1)
+        
+        let taskElements = app.staticTexts.matching(identifier: "TaskTitle")
+        var taskNames: [String] = []
+        
+        for i in 0..<taskElements.count {
+            let taskName = taskElements.element(boundBy: i).label.trimmingCharacters(in: .whitespacesAndNewlines)
+            taskNames.append(taskName)
+        }
+        
+        let sortedTaskNames = taskNames.sorted()
+        XCTAssertEqual(taskNames, sortedTaskNames, "Tasks are not sorted alphabetically.")
+        
+        let filterButton = app.buttons["All"]
+        XCTAssertTrue(filterButton.waitForExistence(timeout: 3), "Filter button is missing.")
+        
+        if !filterButton.isHittable {
+            app.swipeUp()
+        }
+        filterButton.tap()
+        
+        let completedFilterButton = app.buttons["Completed"]
+        XCTAssertTrue(completedFilterButton.waitForExistence(timeout: 3), "Completed filter option is missing.")
+        
+        completedFilterButton.tap()
     }
 
-    @MainActor
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
-        }
+
+    func testAccessibilityElements() {
+        let addPulseButton = app.buttons["Add Task"]
+
+        XCTAssertTrue(addPulseButton.waitForExistence(timeout: 5), "Add task pulse button is missing.")
     }
 }

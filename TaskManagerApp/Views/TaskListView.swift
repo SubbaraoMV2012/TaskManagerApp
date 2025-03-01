@@ -56,8 +56,6 @@ struct TaskListView: View {
                         showingAddTask = true
                     }
                     .foregroundColor(viewModel.accentColor)
-                    .accessibilityLabel("Add New Task")
-                    .accessibilityHint("Tap to add a new task")
                     .keyboardShortcut("N", modifiers: .command)
                 }
                 ToolbarItem(placement: .topBarLeading) {
@@ -107,6 +105,7 @@ struct TaskListView: View {
                     Text("Alphabetically").tag(SortOption.byAlphabetically)
                 }
                 .pickerStyle(MenuPickerStyle())
+                .accessibilityIdentifier("Sort tasks")
             }
             
             VStack(alignment: .leading) {
@@ -120,6 +119,7 @@ struct TaskListView: View {
                     Text("Pending").tag(TaskStatus.pending as TaskStatus?)
                 }
                 .pickerStyle(MenuPickerStyle())
+                .accessibilityIdentifier("Filter tasks")
             }
             Spacer()
         }
@@ -234,26 +234,28 @@ struct PulsingButton: View {
     var onTap: () -> Void
     
     var body: some View {
-        Image(systemName: "plus.circle.fill")
-            .font(.title)
-            .scaleEffect(isTapped ? 1.2 : (isPulsing ? 1.1 : 1.0))
-            .onAppear {
-                withAnimation(.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
-                    isPulsing = true
+        Button(action: {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2)) {
+                isTapped = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                withAnimation {
+                    isTapped = false
                 }
             }
-            .onTapGesture {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0.2)) {
-                    isTapped = true
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    withAnimation {
-                        isTapped = false
+            onTap()
+        }) {
+            Image(systemName: "plus.circle.fill")
+                .font(.title)
+                .scaleEffect(isTapped ? 1.2 : (isPulsing ? 1.1 : 1.0))
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
+                        isPulsing = true
                     }
                 }
-                onTap()
-            }
-            .accessibilityLabel("Add Task")
+        }
+        .accessibilityLabel("Add Task")
+        .accessibilityIdentifier("AddTaskButton")
     }
 }
 
@@ -332,6 +334,7 @@ struct EmptyStateView: View {
                     .cornerRadius(10)
                     .shadow(radius: 5)
             }
+            .accessibilityLabel("Add New Task")
         }
         .padding()
         .transition(.opacity)
