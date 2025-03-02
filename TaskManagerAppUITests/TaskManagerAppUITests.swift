@@ -47,8 +47,6 @@ final class TaskManagerAppUITests: XCTestCase {
     }
     
     func testSortAndFilterTasks() throws {
-        print(app.debugDescription)
-        
         let sortButton = app.buttons["Sort tasks-Filter tasks"]
         XCTAssertTrue(sortButton.waitForExistence(timeout: 5), "Sort & Filter button did not appear in time.")
         
