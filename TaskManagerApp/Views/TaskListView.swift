@@ -304,40 +304,47 @@ struct EmptyStateView: View {
     var onAddTask: () -> Void
     
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "checkmark.circle.badge.questionmark")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 50, height: 50)
-                .foregroundColor(.blue)
-                .opacity(0.8)
-            
-            Text("No tasks yet!")
-                .font(.title2)
-                .fontWeight(.bold)
-                .dynamicTypeSize(.large ... .xxxLarge)
-            
-            Text("Stay productive! Start by adding a new task.")
-                .font(.body)
-                .multilineTextAlignment(.center)
-                .dynamicTypeSize(.large ... .xxxLarge)
-                .foregroundColor(DynamicColors.text)
-                .padding(.horizontal, 30)
-            
-            Button(action: onAddTask) {
-                Label("Add New Task", systemImage: "plus.circle.fill")
-                    .font(.title3)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(width: 200)
-                    .background(Color.blue)
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
+        
+        VStack {
+            Spacer()
+            VStack(spacing: 16) {
+                Image(systemName: "checkmark.circle.badge.questionmark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+                    .foregroundColor(.blue)
+                    .opacity(0.8)
+                
+                Text("No tasks yet!")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .dynamicTypeSize(.large ... .xxxLarge)
+                
+                Text("Stay productive! Start by adding a new task.")
+                    .font(.body)
+                    .multilineTextAlignment(.center)
+                    .dynamicTypeSize(.large ... .xxxLarge)
+                    .foregroundColor(DynamicColors.text)
+                    .padding(.horizontal, 30)
+                
+                Button(action: onAddTask) {
+                    Label("Add New Task", systemImage: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(width: 200)
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
+                }
+                .accessibilityLabel("Add New Task")
             }
-            .accessibilityLabel("Add New Task")
+            Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
         .transition(.opacity)
+
     }
 }
 
